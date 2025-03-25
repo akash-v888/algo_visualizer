@@ -42,6 +42,17 @@ class AlgoVisualizer:
         reset_button = tk.Button(controls_frame, text="Reset", command=self.reset)
         reset_button.pack(side=tk.LEFT, padx=10)
 
+        # Number of bars slider
+        self.size_slider = tk.Scale(controls_frame, from_=10, to=100, label="Number of Bars", orient=tk.HORIZONTAL)
+        self.size_slider.set(self.num_bars)
+        self.size_slider.pack(side=tk.LEFT, padx=10)
+
+        # Data order dropdown
+        self.order_var = tk.StringVar()
+        self.order_var.set("Random")
+        order_menu = tk.OptionMenu(controls_frame, self.order_var, "Random", "In Order", "Reverse Order")
+        order_menu.pack(side=tk.LEFT, padx=10)
+
     def draw_bars(self, data, color_array=None):
         self.canvas.delete("all")
         if color_array is None:
@@ -57,7 +68,20 @@ class AlgoVisualizer:
         self.master.update_idletasks()
 
     def reset(self):
-        self.data = [random.randint(10, HEIGHT) for _ in range(self.num_bars)]
+        self.num_bars = self.size_slider.get()
+        order = self.order_var.get()
+
+        if order == "Random":
+            self.data = [random.randint(10, HEIGHT) for _ in range(self.num_bars)]
+        elif order == "In Order":
+            self.data = list(range(10, HEIGHT, (HEIGHT - 10) // self.num_bars))[:self.num_bars]
+        elif order == "Reverse Order":
+            self.data = list(range(HEIGHT, 10, -((HEIGHT - 10) // self.num_bars)))[:self.num_bars]
+
+        # Recalculate bar width to fit the new number of bars
+        global BAR_WIDTH
+        BAR_WIDTH = WIDTH // self.num_bars
+
         self.i = 0
         self.j = 0
         self.sorting = False
