@@ -21,37 +21,49 @@ class AlgoVisualizer:
         self.j = 0
         self.sorting = False
 
-        controls_frame = tk.Frame(master)
-        controls_frame.pack(pady=10)
+        # Top-level layout for controls
+        controls_frame = tk.Frame(master, pady=10)
+        controls_frame.pack()
 
-        # Dropdown menu
-        self.algorithm_var = tk.StringVar()
-        self.algorithm_var.set("Bubble Sort")
-        algo_menu = tk.OptionMenu(controls_frame, self.algorithm_var,
-                          "Bubble Sort", "Insertion Sort", "Selection Sort", "Merge Sort", "Quick Sort")
+        # --- Row 1: Algorithm & Order ---
+        row1 = tk.Frame(controls_frame)
+        row1.pack(pady=5)
 
+        self.algorithm_var = tk.StringVar(value="Bubble Sort")
+        algo_menu = tk.OptionMenu(row1, self.algorithm_var, 
+                                  "Bubble Sort", "Insertion Sort", "Selection Sort", "Merge Sort", "Quick Sort")
+        algo_menu.config(width=15)
+        tk.Label(row1, text="Algorithm:").pack(side=tk.LEFT, padx=5)
         algo_menu.pack(side=tk.LEFT, padx=10)
 
-        self.delay_slider = tk.Scale(controls_frame, from_=1, to=200, label="Speed (ms)", orient=tk.HORIZONTAL)
-        self.delay_slider.set(20)
-        self.delay_slider.pack(side=tk.LEFT, padx=10)
-
-        start_button = tk.Button(controls_frame, text="Start", command=self.start_sorting)
-        start_button.pack(side=tk.LEFT, padx=10)
-
-        reset_button = tk.Button(controls_frame, text="Reset", command=self.reset)
-        reset_button.pack(side=tk.LEFT, padx=10)
-
-        # Number of bars slider
-        self.size_slider = tk.Scale(controls_frame, from_=10, to=100, label="Number of Bars", orient=tk.HORIZONTAL)
-        self.size_slider.set(self.num_bars)
-        self.size_slider.pack(side=tk.LEFT, padx=10)
-
-        # Data order dropdown
-        self.order_var = tk.StringVar()
-        self.order_var.set("Random")
-        order_menu = tk.OptionMenu(controls_frame, self.order_var, "Random", "In Order", "Reverse Order")
+        self.order_var = tk.StringVar(value="Random")
+        order_menu = tk.OptionMenu(row1, self.order_var, "Random", "In Order", "Reverse Order")
+        order_menu.config(width=15)
+        tk.Label(row1, text="Data Order:").pack(side=tk.LEFT, padx=5)
         order_menu.pack(side=tk.LEFT, padx=10)
+
+        # --- Row 2: Sliders ---
+        row2 = tk.Frame(controls_frame)
+        row2.pack(pady=5)
+
+        self.size_slider = tk.Scale(row2, from_=10, to=100, label="Number of Bars", orient=tk.HORIZONTAL, length=200)
+        self.size_slider.set(self.num_bars)
+        self.size_slider.pack(side=tk.LEFT, padx=20)
+
+        self.delay_slider = tk.Scale(row2, from_=1, to=200, label="Speed (ms)", orient=tk.HORIZONTAL, length=200)
+        self.delay_slider.set(20)
+        self.delay_slider.pack(side=tk.LEFT, padx=20)
+
+        # --- Row 3: Buttons ---
+        row3 = tk.Frame(controls_frame)
+        row3.pack(pady=10)
+
+        start_button = tk.Button(row3, text="Start", width=12, bg="#4CAF50", fg="black", command=self.start_sorting)
+        start_button.pack(side=tk.LEFT, padx=20)
+
+        reset_button = tk.Button(row3, text="Reset", width=12, bg="#f44336", fg="black", command=self.reset)
+        reset_button.pack(side=tk.LEFT, padx=20)
+
 
     def draw_bars(self, data, color_array=None):
         self.canvas.delete("all")
@@ -256,5 +268,9 @@ class AlgoVisualizer:
 # Run GUI
 if __name__ == "__main__":
     root = tk.Tk()
+    root.title("Sorting Algorithm Visualizer")
+
+    root.option_add("*Font", ("Segoe UI", 10))  # Modern clean font
+
     visualizer = AlgoVisualizer(root)
     root.mainloop()
