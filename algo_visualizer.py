@@ -265,12 +265,11 @@ class AlgoVisualizer:
         else:
             self.draw_bars(self.data, ["green"] * len(self.data))
 
-# Run GUI
 if __name__ == "__main__":
     root = tk.Tk()
     root.title("Sorting Algorithm Visualizer")
 
-    root.option_add("*Font", ("Segoe UI", 10))  # Modern clean font
+    root.option_add("*Font", ("Segoe UI", 10))
 
     visualizer = AlgoVisualizer(root)
     root.mainloop()
