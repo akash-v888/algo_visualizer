@@ -27,7 +27,9 @@ class AlgoVisualizer:
         # Dropdown menu
         self.algorithm_var = tk.StringVar()
         self.algorithm_var.set("Bubble Sort")
-        algo_menu = tk.OptionMenu(controls_frame, self.algorithm_var, "Bubble Sort", "Insertion Sort", "Selection Sort")
+        algo_menu = tk.OptionMenu(controls_frame, self.algorithm_var,
+                          "Bubble Sort", "Insertion Sort", "Selection Sort", "Merge Sort", "Quick Sort")
+
         algo_menu.pack(side=tk.LEFT, padx=10)
 
         self.delay_slider = tk.Scale(controls_frame, from_=1, to=200, label="Speed (ms)", orient=tk.HORIZONTAL)
@@ -73,6 +75,10 @@ class AlgoVisualizer:
             self.insertion_sort_step()
         elif algo == "Selection Sort":
             self.selection_sort_step()
+        elif algo == "Merge Sort":
+            self.merge_sort_animate()
+        elif algo == "Quick Sort":
+            self.quick_sort_animate()
 
     # --------------------
     # Sorting Algorithms
@@ -98,6 +104,7 @@ class AlgoVisualizer:
         else:
             self.draw_bars(self.data, ["green"] * len(self.data))
 
+
     def insertion_sort_step(self):
         if self.i < len(self.data):
             key = self.data[self.i]
@@ -116,6 +123,7 @@ class AlgoVisualizer:
         else:
             self.draw_bars(self.data, ["green"] * len(self.data))
 
+
     def selection_sort_step(self):
         if self.i < len(self.data):
             min_idx = self.i
@@ -130,6 +138,94 @@ class AlgoVisualizer:
 
             self.i += 1
             self.master.after(self.delay_slider.get(), self.selection_sort_step)
+        else:
+            self.draw_bars(self.data, ["green"] * len(self.data))
+    
+
+    def merge_sort_animate(self):
+        self.actions = []
+        self.merge_sort(self.data, 0, len(self.data) - 1)
+        self.animate_merge_step(0)
+
+    def merge_sort(self, arr, left, right):
+        if left < right:
+            mid = (left + right) // 2
+            self.merge_sort(arr, left, mid)
+            self.merge_sort(arr, mid + 1, right)
+            self.merge(arr, left, mid, right)
+
+    def merge(self, arr, left, mid, right):
+        left_copy = arr[left:mid + 1]
+        right_copy = arr[mid + 1:right + 1]
+        i = j = 0
+        k = left
+
+        while i < len(left_copy) and j < len(right_copy):
+            if left_copy[i] <= right_copy[j]:
+                arr[k] = left_copy[i]
+                self.actions.append((arr[:], [k]))
+                i += 1
+            else:
+                arr[k] = right_copy[j]
+                self.actions.append((arr[:], [k]))
+                j += 1
+            k += 1
+
+        while i < len(left_copy):
+            arr[k] = left_copy[i]
+            self.actions.append((arr[:], [k]))
+            i += 1
+            k += 1
+
+        while j < len(right_copy):
+            arr[k] = right_copy[j]
+            self.actions.append((arr[:], [k]))
+            j += 1
+            k += 1
+
+    def animate_merge_step(self, idx):
+        if idx < len(self.actions):
+            snapshot, highlights = self.actions[idx]
+            color_array = ["green" if i in highlights else "blue" for i in range(len(snapshot))]
+            self.data = snapshot
+            self.draw_bars(snapshot, color_array)
+            self.master.after(self.delay_slider.get(), lambda: self.animate_merge_step(idx + 1))
+        else:
+            self.draw_bars(self.data, ["green"] * len(self.data))
+
+
+    def quick_sort_animate(self):
+        self.actions = []
+        self.quick_sort(self.data, 0, len(self.data) - 1)
+        self.animate_quick_step(0)
+
+    def quick_sort(self, arr, low, high):
+        if low < high:
+            pivot_index = self.partition(arr, low, high)
+            self.quick_sort(arr, low, pivot_index - 1)
+            self.quick_sort(arr, pivot_index + 1, high)
+
+    def partition(self, arr, low, high):
+        pivot = arr[high]
+        i = low - 1
+        for j in range(low, high):
+            if arr[j] <= pivot:
+                i += 1
+                arr[i], arr[j] = arr[j], arr[i]
+                self.actions.append((arr[:], [i, j]))
+        arr[i + 1], arr[high] = arr[high], arr[i + 1]
+        self.actions.append((arr[:], [i + 1, high]))
+        return i + 1
+
+    def animate_quick_step(self, idx):
+        if idx < len(self.actions):
+            snapshot, highlights = self.actions[idx]
+            color_array = ["blue"] * len(snapshot)
+            for i in highlights:
+                color_array[i] = "red"
+            self.data = snapshot
+            self.draw_bars(snapshot, color_array)
+            self.master.after(self.delay_slider.get(), lambda: self.animate_quick_step(idx + 1))
         else:
             self.draw_bars(self.data, ["green"] * len(self.data))
 
